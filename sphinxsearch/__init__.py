@@ -1,8 +1,7 @@
 import argparse
 import json
 import sys
-
-from elasticsearch import Elasticsearch, helpers
+from opensearchpy import OpenSearch, helpers
 
 
 def get_parser():
@@ -15,9 +14,12 @@ def get_parser():
              'one.'
     )
     parser.add_argument(
-        '--hostname',
-        metavar='<hostname>',
-        help='Elasticsearch hostname.'
+        '--hosts',
+        metavar='<host:port>',
+        nargs='+',
+        default=['localhost:9200'],
+        help='Elasticsearch hosts.\nProvide one or multiple host:port values '
+             'separated by space for multiple hosts.'
     )
     parser.add_argument(
         '--index',
@@ -35,7 +37,7 @@ def get_parser():
     parser.add_argument(
         '--port',
         metavar='<port>',
-        choices=[443],
+        default=9200,
         help='Elasticsearch port.'
     )
     parser.add_argument(
@@ -49,28 +51,33 @@ def get_parser():
     parser.add_argument(
         '--user',
         metavar='<username>',
+        required=True,
         help='Elasticsearch username.'
     )
     parser.add_argument(
         '--scheme',
         metavar='<scheme>',
         choices=['https', 'http'],
+        default='https',
         help='Elasticsearch scheme.'
     )
     parser.add_argument(
-        '--secret',
-        metavar='<secret>',
-        help='Elasticsearch secret.'
+        '--password',
+        metavar='<password>',
+        required=True,
+        help='Elasticsearch password'
     )
 
     args = parser.parse_args()
     return args
 
-def delete_index(es, index):
+
+def delete_index(client, index):
     try:
-        es.indices.delete(index=index, ignore=[400, 404])
+        client.indices.delete(index=index, ignore=[400, 404])
     except Exception as e:
-        sys.exit('Exception raised while index deletion:\n' + e)
+        sys.exit('Exception raised while index deletion:\n' + str(e))
+
 
 def generate_path(args):
     path = args.path
@@ -90,15 +97,15 @@ def get_file_structure(path):
     return file_structure
 
 
-def create_index(es, json_list, index):
+def create_index(client, json_list, index):
     try:
-        response = helpers.bulk(es, json_list, index=index)
+        response = helpers.bulk(client, json_list, index=index)
     except Exception as e:
-        sys.exit("\nERROR:\n" + e)
+        sys.exit("\nERROR:\n" + str(e))
     return response
 
 
-def create_index_data(es, path, file_structure, index, post_count):
+def create_index_data(client, path, file_structure, index, post_count):
     json_list = []
     responses = []
     file_structure_length = len(file_structure)
@@ -111,7 +118,7 @@ def create_index_data(es, path, file_structure, index, post_count):
             data = json.load(file)
             file.close()
         except Exception as e:
-            sys.exit("\nERROR:\n" + e)
+            sys.exit("\nERROR:\n" + str(e))
         json_list.append(data)
         file_structure_length -= 1
         i += 1
@@ -119,7 +126,7 @@ def create_index_data(es, path, file_structure, index, post_count):
         if (i < post_count) and (file_structure_length != 0):
             continue
         else:
-            resp = create_index(es, json_list, index)
+            resp = create_index(client, json_list, index)
             responses.append(resp)
             json_list = []
             i = 0
@@ -130,15 +137,38 @@ def create_index_data(es, path, file_structure, index, post_count):
     return json_response
 
 
+def generate_json_host_list(hosts):
+    host_list = []
+    for host in hosts:
+        raw_host = host.split(':')
+        if len(raw_host) != 2:
+            raise Exception('--hosts parameter does not match the following '
+                            'format: hostname:port')
+        json_host = {'host': raw_host[0], 'port': raw_host[1]}
+        host_list.append(json_host)
+    return host_list
+
+
 def main():
-    es = Elasticsearch()
     args = get_parser()
+    hosts = generate_json_host_list(args.hosts)
+
+    client = OpenSearch(
+        hosts=hosts,
+        http_compress=True,
+        http_auth=(args.user, args.password),
+        use_ssl=True,
+        verify_certs=True,
+        ssl_assert_hostname=False,
+        ssl_show_warn=False
+    )
+
     if args.delete_index:
-        delete_index(es=es, index=args.index)
+        delete_index(client=client, index=args.index)
     path = generate_path(args)
     file_structure = get_file_structure(path)
     response = create_index_data(
-        es=es,
+        client=client,
         path=path,
         file_structure=file_structure,
         index=args.index,
