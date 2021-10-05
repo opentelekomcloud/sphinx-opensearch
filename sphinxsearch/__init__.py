@@ -18,14 +18,14 @@ def get_parser():
         metavar='<host:port>',
         nargs='+',
         default=['localhost:9200'],
-        help='Elasticsearch hosts.\nProvide one or multiple host:port values '
+        help='OpenSearch hosts.\nProvide one or multiple host:port values '
              'separated by space for multiple hosts.'
     )
     parser.add_argument(
         '--index',
         metavar='<index>',
         default='test-index',
-        help='Elasticsearch index.\n'
+        help='OpenSearch index.\n'
              'Default: test-index'
     )
     parser.add_argument(
@@ -38,32 +38,32 @@ def get_parser():
         '--port',
         metavar='<port>',
         default=9200,
-        help='Elasticsearch port.'
+        help='OpenSearch port.'
     )
     parser.add_argument(
         '--post-count',
         metavar='<count>',
         default=5,
         type=int,
-        help='Number of files being loaded for elasticsearch import at the\n'
+        help='Number of files being loaded for OpenSearch import at the\n'
              'same time.'
     )
     parser.add_argument(
         '--disable-ssl',
         action='store_true',
-        help='Disables https authentication to Opensearch.'
+        help='Disables https authentication to OpenSearch.'
     )
     parser.add_argument(
         '--user',
         metavar='<username>',
         required=True,
-        help='Elasticsearch username.'
+        help='OpenSearch username.'
     )
     parser.add_argument(
         '--password',
         metavar='<password>',
         required=True,
-        help='Elasticsearch password'
+        help='OpenSearch password'
     )
 
     args = parser.parse_args()
