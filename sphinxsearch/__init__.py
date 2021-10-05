@@ -49,17 +49,15 @@ def get_parser():
              'same time.'
     )
     parser.add_argument(
+        '--disable-ssl',
+        action='store_true',
+        help='Disables https authentication to Opensearch.'
+    )
+    parser.add_argument(
         '--user',
         metavar='<username>',
         required=True,
         help='Elasticsearch username.'
-    )
-    parser.add_argument(
-        '--scheme',
-        metavar='<scheme>',
-        choices=['https', 'http'],
-        default='https',
-        help='Elasticsearch scheme.'
     )
     parser.add_argument(
         '--password',
@@ -153,15 +151,22 @@ def main():
     args = get_parser()
     hosts = generate_json_host_list(args.hosts)
 
-    client = OpenSearch(
-        hosts=hosts,
-        http_compress=True,
-        http_auth=(args.user, args.password),
-        use_ssl=True,
-        verify_certs=True,
-        ssl_assert_hostname=False,
-        ssl_show_warn=False
-    )
+    if args.disable_ssl:
+        client = OpenSearch(
+            hosts=hosts,
+            http_compress=True,
+            http_auth=(args.user, args.password),
+        )
+    else:
+        client = OpenSearch(
+            hosts=hosts,
+            http_compress=True,
+            http_auth=(args.user, args.password),
+            use_ssl=True,
+            verify_certs=True,
+            ssl_assert_hostname=False,
+            ssl_show_warn=False
+        )
 
     if args.delete_index:
         delete_index(client=client, index=args.index)
