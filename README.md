@@ -1,1 +1,1 @@
-# sphinx-elasticsearch-import
+# python-sphinxsearch
