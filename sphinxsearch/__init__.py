@@ -2,6 +2,8 @@ import argparse
 import json
 import sys
 from opensearchpy import OpenSearch, helpers
+from bs4 import BeautifulSoup
+
 
 
 def get_parser():
@@ -114,6 +116,7 @@ def create_index_data(client, path, file_structure, index, post_count):
         try:
             file = open(file_path,)
             data = json.load(file)
+            data["body"] = BeautifulSoup(data["body"], "lxml").text
             file.close()
         except Exception as e:
             sys.exit("\nERROR:\n" + str(e))
