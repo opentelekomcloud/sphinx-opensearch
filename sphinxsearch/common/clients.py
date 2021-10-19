@@ -18,20 +18,20 @@ def generate_os_host_list(hosts):
 
 def generate_es_host_list(hosts):
     port_sum = 0
-    port = 0
+    port = None
     host_list = []
 
-    for value in hosts.values():
-        port_sum += value
+    for host in hosts:
+        raw_host = host.split(':')
+        host_list.append(raw_host[0])
+        raw_host[1] = int(raw_host[1])
+        port_sum += raw_host[1]
+        if not port:
+            port = raw_host[1]
 
-    if (port_sum // len(hosts.values())) == list(hosts.values())[0]:
-        raise Exception('Error: ' + port_sum)
-    else:
-        raise Exception('Ken Error: ' + list(hosts.values())[0])
-        port = hosts.values()[0]
-
-    for key in hosts.keys():
-        host_list.append(key)
+    if ((port_sum // len(hosts)) != port):
+        raise Exception('Error: For variant elasticsearch specified ports '
+                        'cannot be different: ' + str(hosts))
 
     return host_list, port
 
@@ -42,12 +42,13 @@ class Searchclient:
         self.variant = variant
         self.username = username
         self.password = password
-        self.hosts = generate_json_host_list(hosts)
+        self.hosts = hosts
 
     def connect(self):
         if self.variant == 'opensearch':
+            hosts = generate_os_host_list(self.hosts)
             client = OpenSearch(
-                hosts=self.hosts,
+                hosts=hosts,
                 http_compress=True,
                 http_auth=(self.username, self.password),
                 use_ssl=True,
@@ -58,12 +59,11 @@ class Searchclient:
             return client
 
         elif self.variant == 'elasticsearch':
-            hosts, port = generate_os_host_list(self.hosts)
-            port = 0
+            hosts, port = generate_es_host_list(self.hosts)
             client = Elasticsearch(
-                hosts,
+                hosts=hosts,
                 http_auth=(self.username, self.password),
                 scheme='https',
-                port=list(self.hosts.values())[0]
+                port=port
             )
             return client

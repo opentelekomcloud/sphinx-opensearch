@@ -3,6 +3,7 @@ import json
 import sys
 from bs4 import BeautifulSoup
 from common.clients import Searchclient
+from elasticsearch import helpers
 
 
 def get_parser():
@@ -137,28 +138,27 @@ def create_index_data(client, path, file_structure, index, post_count):
 def main():
     args = get_parser()
 
-    client = Searchclient.connect(
+    client = Searchclient(
         variant=args.variant,
-        username=args.username,
+        username=args.user,
         password=args.password,
         hosts=args.hosts
     )
-    print(client)
+    client = client.connect()
 
-    # if args.delete_index:
-    #     delete_index(client=client, index=args.index)
-    # path = generate_path(args)
-    # file_structure = get_file_structure(path)
-    # response = create_index_data(
-    #     client=client,
-    #     path=path,
-    #     file_structure=file_structure,
-    #     index=args.index,
-    #     post_count=args.post_count
-    # )
-    # print(str(response['uploaded_files']) + ' new files successfully
-    # imported'
-    #       ' to index ' + args.index)
+    if args.delete_index:
+        delete_index(client=client, index=args.index)
+    path = generate_path(args)
+    file_structure = get_file_structure(path)
+    response = create_index_data(
+        client=client,
+        path=path,
+        file_structure=file_structure,
+        index=args.index,
+        post_count=args.post_count
+    )
+    print(str(response['uploaded_files']) + ' new files successfully imported'
+          ' to index ' + args.index)
 
 
 if __name__ == "__main__":
