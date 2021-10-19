@@ -3,7 +3,7 @@ from opensearchpy import helpers as os_helpers
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers as es_helpers
 
-    
+
 def generate_os_host_list(hosts):
     host_list = []
     for host in hosts:
@@ -24,13 +24,13 @@ def generate_es_host_list(hosts):
     for value in hosts.values():
         port_sum += value
 
-    if not (port_sum // len(hosts.values())) == list(hosts.values()).[0]:
+    if (port_sum // len(hosts.values())) == list(hosts.values())[0]:
         raise Exception('Error: ' + port_sum)
     else:
-        raise Exception('Ken Error: ' + list(hosts.values()).[0])
-        port = hosts.values()).[0]
+        raise Exception('Ken Error: ' + list(hosts.values())[0])
+        port = hosts.values()[0]
 
-    for key in .hosts.keys():
+    for key in hosts.keys():
         host_list.append(key)
 
     return host_list, port
@@ -38,16 +38,14 @@ def generate_es_host_list(hosts):
 
 class Searchclient:
 
-
     def __init__(self, variant, username, password, hosts):
         self.variant = variant
         self.username = username
         self.password = password
         self.hosts = generate_json_host_list(hosts)
 
-
     def connect(self):
-        if self.variant = 'opensearch':
+        if self.variant == 'opensearch':
             client = OpenSearch(
                 hosts=self.hosts,
                 http_compress=True,
@@ -59,13 +57,13 @@ class Searchclient:
             )
             return client
 
-        elif self.variant = 'elasticsearch':
+        elif self.variant == 'elasticsearch':
             hosts, port = generate_os_host_list(self.hosts)
             port = 0
             client = Elasticsearch(
                 hosts,
                 http_auth=(self.username, self.password),
                 scheme='https',
-                port=list(self.hosts.values()).[0]
+                port=list(self.hosts.values())[0]
             )
             return client
