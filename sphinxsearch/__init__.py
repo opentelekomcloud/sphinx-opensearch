@@ -1,14 +1,12 @@
 import argparse
 import json
 import sys
-from opensearchpy import OpenSearch, helpers
 from bs4 import BeautifulSoup
-
+from common.clients import Searchclient
 
 
 def get_parser():
     parser = argparse.ArgumentParser()
-
     parser.add_argument(
         '--delete-index',
         action='store_true',
@@ -37,23 +35,12 @@ def get_parser():
         help='Path to json output folder of Sphinx.'
     )
     parser.add_argument(
-        '--port',
-        metavar='<port>',
-        default=9200,
-        help='OpenSearch port.'
-    )
-    parser.add_argument(
         '--post-count',
         metavar='<count>',
         default=5,
         type=int,
         help='Number of files being loaded for OpenSearch import at the\n'
              'same time.'
-    )
-    parser.add_argument(
-        '--disable-ssl',
-        action='store_true',
-        help='Disables https authentication to OpenSearch.'
     )
     parser.add_argument(
         '--user',
@@ -66,6 +53,15 @@ def get_parser():
         metavar='<password>',
         required=True,
         help='OpenSearch password'
+    )
+    parser.add_argument(
+        '--variant',
+        metavar='<variant>',
+        default='elasticsearch',
+        choices=['elasticsearch', 'opensearch'],
+        help=('Search backend variant.\n'
+              'default: elasticsearch\n'
+              'choices: elasticsearch, opensearch')
     )
 
     args = parser.parse_args()
@@ -138,52 +134,31 @@ def create_index_data(client, path, file_structure, index, post_count):
     return json_response
 
 
-def generate_json_host_list(hosts):
-    host_list = []
-    for host in hosts:
-        raw_host = host.split(':')
-        if len(raw_host) != 2:
-            raise Exception('--hosts parameter does not match the following '
-                            'format: hostname:port')
-        json_host = {'host': raw_host[0], 'port': raw_host[1]}
-        host_list.append(json_host)
-    return host_list
-
-
 def main():
     args = get_parser()
-    hosts = generate_json_host_list(args.hosts)
 
-    if args.disable_ssl:
-        client = OpenSearch(
-            hosts=hosts,
-            http_compress=True,
-            http_auth=(args.user, args.password),
-        )
-    else:
-        client = OpenSearch(
-            hosts=hosts,
-            http_compress=True,
-            http_auth=(args.user, args.password),
-            use_ssl=True,
-            verify_certs=True,
-            ssl_assert_hostname=False,
-            ssl_show_warn=False
-        )
-
-    if args.delete_index:
-        delete_index(client=client, index=args.index)
-    path = generate_path(args)
-    file_structure = get_file_structure(path)
-    response = create_index_data(
-        client=client,
-        path=path,
-        file_structure=file_structure,
-        index=args.index,
-        post_count=args.post_count
+    client = Searchclient.connect(
+        variant=args.variant,
+        username=args.username,
+        password=args.password,
+        hosts=args.hosts
     )
-    print(str(response['uploaded_files']) + ' new files successfully imported'
-          ' to index ' + args.index)
+    print(client)
+
+    # if args.delete_index:
+    #     delete_index(client=client, index=args.index)
+    # path = generate_path(args)
+    # file_structure = get_file_structure(path)
+    # response = create_index_data(
+    #     client=client,
+    #     path=path,
+    #     file_structure=file_structure,
+    #     index=args.index,
+    #     post_count=args.post_count
+    # )
+    # print(str(response['uploaded_files']) + ' new files successfully
+    # imported'
+    #       ' to index ' + args.index)
 
 
 if __name__ == "__main__":
