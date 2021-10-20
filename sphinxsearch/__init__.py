@@ -93,14 +93,6 @@ def get_file_structure(path):
     return file_structure
 
 
-# def create_index(client, json_list, index):
-#     try:
-#         response = helpers.bulk(client, json_list, index=index)
-#     except Exception as e:
-#         sys.exit("\nERROR:\n" + str(e))
-#     return response
-
-
 def create_index_data(client, path, file_structure,
                       index, post_count, variant):
     json_list = []
