@@ -2,8 +2,7 @@ import argparse
 import json
 import sys
 from bs4 import BeautifulSoup
-from common.clients import Searchclient
-from elasticsearch import helpers
+from common.clients import Searchclient, create_index
 
 
 def get_parser():
@@ -19,14 +18,14 @@ def get_parser():
         metavar='<host:port>',
         nargs='+',
         default=['localhost:9200'],
-        help='OpenSearch hosts.\nProvide one or multiple host:port values '
+        help='Provide one or multiple host:port values '
              'separated by space for multiple hosts.'
     )
     parser.add_argument(
         '--index',
         metavar='<index>',
         default='test-index',
-        help='OpenSearch index.\n'
+        help='Search index for OpenSearch or ElasticSearch.\n'
              'Default: test-index'
     )
     parser.add_argument(
@@ -40,25 +39,25 @@ def get_parser():
         metavar='<count>',
         default=5,
         type=int,
-        help='Number of files being loaded for OpenSearch import at the\n'
+        help='Number of files being loaded for indexing at the\n'
              'same time.'
     )
     parser.add_argument(
         '--user',
         metavar='<username>',
         required=True,
-        help='OpenSearch username.'
+        help='Username for the connection.'
     )
     parser.add_argument(
         '--password',
         metavar='<password>',
         required=True,
-        help='OpenSearch password'
+        help='Password for the connection.'
     )
     parser.add_argument(
         '--variant',
         metavar='<variant>',
-        default='elasticsearch',
+        default='opensearch',
         choices=['elasticsearch', 'opensearch'],
         help=('Search backend variant.\n'
               'default: elasticsearch\n'
@@ -94,15 +93,16 @@ def get_file_structure(path):
     return file_structure
 
 
-def create_index(client, json_list, index):
-    try:
-        response = helpers.bulk(client, json_list, index=index)
-    except Exception as e:
-        sys.exit("\nERROR:\n" + str(e))
-    return response
+# def create_index(client, json_list, index):
+#     try:
+#         response = helpers.bulk(client, json_list, index=index)
+#     except Exception as e:
+#         sys.exit("\nERROR:\n" + str(e))
+#     return response
 
 
-def create_index_data(client, path, file_structure, index, post_count):
+def create_index_data(client, path, file_structure,
+                      index, post_count, variant):
     json_list = []
     responses = []
     file_structure_length = len(file_structure)
@@ -124,7 +124,12 @@ def create_index_data(client, path, file_structure, index, post_count):
         if (i < post_count) and (file_structure_length != 0):
             continue
         else:
-            resp = create_index(client, json_list, index)
+            resp = create_index(
+                client=client,
+                json_list=json_list,
+                index=index,
+                variant=variant
+            )
             responses.append(resp)
             json_list = []
             i = 0
@@ -155,7 +160,8 @@ def main():
         path=path,
         file_structure=file_structure,
         index=args.index,
-        post_count=args.post_count
+        post_count=args.post_count,
+        variant=args.variant
     )
     print(str(response['uploaded_files']) + ' new files successfully imported'
           ' to index ' + args.index)

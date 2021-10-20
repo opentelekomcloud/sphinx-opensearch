@@ -1,3 +1,5 @@
+import sys
+
 from opensearchpy import OpenSearch
 from opensearchpy import helpers as os_helpers
 from elasticsearch import Elasticsearch
@@ -34,6 +36,25 @@ def generate_es_host_list(hosts):
                         'cannot be different: ' + str(hosts))
 
     return host_list, port
+
+
+def create_index(client, json_list, index, variant):
+    try:
+        if variant == 'opensearch':
+            response = os_helpers.bulk(
+                client,
+                json_list,
+                index=index
+            )
+        if variant == 'elasticsearch':
+            response = es_helpers.bulk(
+                client,
+                json_list,
+                index=index
+            )
+    except Exception as e:
+        sys.exit("\nERROR:\n" + str(e))
+    return response
 
 
 class Searchclient:
