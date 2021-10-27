@@ -60,7 +60,7 @@ def get_parser():
         default='opensearch',
         choices=['elasticsearch', 'opensearch'],
         help=('Search backend variant.\n'
-              'default: elasticsearch\n'
+              'default: opensearch\n'
               'choices: elasticsearch, opensearch')
     )
 
