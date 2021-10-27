@@ -1,6 +1,8 @@
 import argparse
 import json
 import sys
+import os
+
 from bs4 import BeautifulSoup
 from common.clients import Searchclient, create_index
 
@@ -45,13 +47,11 @@ def get_parser():
     parser.add_argument(
         '--user',
         metavar='<username>',
-        required=True,
         help='Username for the connection.'
     )
     parser.add_argument(
         '--password',
         metavar='<password>',
-        required=True,
         help='Password for the connection.'
     )
     parser.add_argument(
@@ -66,6 +66,26 @@ def get_parser():
 
     args = parser.parse_args()
     return args
+
+
+def get_user(args):
+    user = {
+        'name': '',
+        'password': ''
+    }
+    user['name'] = os.environ.get('SEARCH_USER')
+    user['password'] = os.environ.get('SEARCH_PASSWORD')
+    if not user['name']:
+        if args.user:
+            user['name'] = args.user
+        else:
+            raise Exception('SEARCH_USER environment variable or --user parameter do not exist.')
+    if not user['password']:
+        if args.password:
+            user['password'] = args.password
+        else:
+            raise Exception('SEARCH_PASSWORD environment variable or --password parameter do not exist.')
+    return user
 
 
 def delete_index(client, index):
@@ -134,11 +154,12 @@ def create_index_data(client, path, file_structure,
 
 def main():
     args = get_parser()
+    user = get_user(args)
 
     client = Searchclient(
         variant=args.variant,
-        username=args.user,
-        password=args.password,
+        username=user['name'],
+        password=user['password'],
         hosts=args.hosts
     )
     client = client.connect()
