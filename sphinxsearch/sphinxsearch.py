@@ -15,7 +15,7 @@ import sys
 import os
 
 from bs4 import BeautifulSoup
-from common.clients import Searchclient, create_index
+from sphinxsearch.common.clients import Searchclient, create_index
 
 
 def get_parser():
@@ -187,7 +187,7 @@ def main():
         post_count=args.post_count,
         variant=args.variant
     )
-    print(str(response['uploaded_files']) + ' new files successfully imported'
+    console.log(str(response['uploaded_files']) + ' new files successfully imported'
           ' to index ' + args.index)
 
 
