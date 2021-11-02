@@ -1,0 +1,23 @@
+CHANGES
+=======
+
+* gitignore and added pbr
+* prepared packaging
+* setup.cfg added
+* start packaging work
+* minor README changes
+* first README draft
+* add environment variable SEARCH\_USER and SEARCH\_PASSWORD as preference
+* delete comments
+* bugfixes and bulk request modification
+* finish clients
+* flake8 corrections
+* Classes
+* add html tag removal for body
+* Update README.md
+* helper renaming
+* added non ssl option
+* changed client from Elasticsearch to Opensearch
+* splitting in methods and further improvements
+* first dirty draft of sphinx data import into Elasticsearch 🚀
+* Initial commit
