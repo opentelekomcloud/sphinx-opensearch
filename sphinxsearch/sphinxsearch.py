@@ -56,7 +56,8 @@ def get_parser():
         metavar='<count>',
         default=5,
         type=int,
-        help='Number of files being loaded for indexing at the same time.'
+        help='Number of files being loaded for indexing at the same time.\n'
+             'Default: 5'
     )
     parser.add_argument(
         '--user',
