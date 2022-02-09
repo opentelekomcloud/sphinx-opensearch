@@ -19,7 +19,9 @@ from sphinxsearch.common.clients import Searchclient, create_index
 
 
 def get_parser():
-    parser = argparse.ArgumentParser()
+    # Format the output of help
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         '--delete-index',
         action='store_true',
@@ -32,28 +34,29 @@ def get_parser():
         nargs='+',
         default=['localhost:9200'],
         help='Provide one or multiple host:port values '
-             'separated by space for multiple hosts.'
+             'separated by space for multiple hosts.\n'
+             'Default: localhost:9200'
     )
     parser.add_argument(
         '--index',
         metavar='<index>',
         default='test-index',
-        help='Search index for OpenSearch or ElasticSearch.\n'
+        help="Search index for OpenSearch or ElasticSearch.\n"
              'Default: test-index'
     )
     parser.add_argument(
         '--path',
         metavar='<path>',
         default=".",
-        help='Path to json output folder of Sphinx.'
+        help="Path to json output folder of Sphinx.\n"
+             'Default: .'
     )
     parser.add_argument(
         '--post-count',
         metavar='<count>',
         default=5,
         type=int,
-        help='Number of files being loaded for indexing at the\n'
-             'same time.'
+        help='Number of files being loaded for indexing at the same time.'
     )
     parser.add_argument(
         '--user',
@@ -90,12 +93,14 @@ def get_user(args):
         if args.user:
             user['name'] = args.user
         else:
-            raise Exception('SEARCH_USER environment variable or --user parameter do not exist.')
+            raise Exception('SEARCH_USER environment variable or --user '
+                            'parameter do not exist.')
     if not user['password']:
         if args.password:
             user['password'] = args.password
         else:
-            raise Exception('SEARCH_PASSWORD environment variable or --password parameter do not exist.')
+            raise Exception('SEARCH_PASSWORD environment variable or '
+                            '--password parameter do not exist.')
     return user
 
 
@@ -187,7 +192,7 @@ def main():
         post_count=args.post_count,
         variant=args.variant
     )
-    console.log(str(response['uploaded_files']) + ' new files successfully imported'
+    print(str(response['uploaded_files']) + ' new files successfully imported'
           ' to index ' + args.index)
 
 
