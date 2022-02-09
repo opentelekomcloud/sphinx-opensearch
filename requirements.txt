@@ -3,5 +3,6 @@
 # process, which may cause wedges in the gate later.
 
 bs4
+lxml
 opensearch-py
 elasticsearch
