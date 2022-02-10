@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+* smaller changes
+* add text formatter
+
+0.0.1
+-----
+
+* minor fixes
 * gitignore and added pbr
 * prepared packaging
 * setup.cfg added
