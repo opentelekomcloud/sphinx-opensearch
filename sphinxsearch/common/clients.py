@@ -69,30 +69,6 @@ def create_index(client, json_list, index, variant):
     return response
 
 
-def set_url(client, url, doc_id, index, variant):
-    try:
-        if variant == 'opensearch':
-            response = client.index(
-                index=index,
-                body={
-                    'url': url
-                },
-                id=doc_id,
-                refresh=True
-            )
-        if variant == 'elasticsearch':
-            response = client.index(
-                index=index,
-                id=doc_id,
-                document={
-                    'url': url
-                }
-            )
-    except Exception as e:
-        sys.exit("\nERROR:\n" + str(e))
-    return response
-
-
 class Searchclient:
 
     def __init__(self, variant, username, password, hosts):

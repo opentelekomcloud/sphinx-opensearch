@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* Added URL Option and fixed pep8
 * lxml added
 * smaller changes
 * add text formatter
