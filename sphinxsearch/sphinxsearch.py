@@ -11,11 +11,12 @@
 # under the License.
 import argparse
 import json
-import sys
 import os
+import sys
 
 from bs4 import BeautifulSoup
-from sphinxsearch.common.clients import Searchclient, create_index
+from sphinxsearch.common.clients import create_index
+from sphinxsearch.common.clients import Searchclient
 
 
 def get_parser():
@@ -78,6 +79,18 @@ def get_parser():
               'default: opensearch\n'
               'choices: elasticsearch, opensearch')
     )
+    parser.add_argument(
+        '--base-url',
+        metavar='<base_url>',
+        required=True,
+        help='Base-URL for the search results.'
+    )
+    parser.add_argument(
+        '--doc-url',
+        metavar='<doc_url>',
+        default='',
+        help='Doc-URL for the search results.'
+    )
 
     args = parser.parse_args()
     return args
@@ -131,7 +144,8 @@ def get_file_structure(path):
 
 
 def create_index_data(client, path, file_structure,
-                      index, post_count, variant):
+                      index, post_count, variant, base_url,
+                      doc_url):
     json_list = []
     responses = []
     file_structure_length = len(file_structure)
@@ -142,6 +156,8 @@ def create_index_data(client, path, file_structure,
         try:
             file = open(file_path,)
             data = json.load(file)
+            data['base_url'] = base_url
+            data['doc_url'] = doc_url
             data["body"] = BeautifulSoup(data["body"], "lxml").text
             file.close()
         except Exception as e:
@@ -162,6 +178,7 @@ def create_index_data(client, path, file_structure,
             responses.append(resp)
             json_list = []
             i = 0
+
     json_response = {
         'responses': responses,
         'uploaded_files': count
@@ -191,7 +208,9 @@ def main():
         file_structure=file_structure,
         index=args.index,
         post_count=args.post_count,
-        variant=args.variant
+        variant=args.variant,
+        base_url=args.base_url,
+        doc_url=args.doc_url
     )
     print(str(response['uploaded_files']) + ' new files successfully imported'
           ' to index ' + args.index)

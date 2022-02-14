@@ -11,10 +11,11 @@
 # under the License.
 import sys
 
-from opensearchpy import OpenSearch
-from opensearchpy import helpers as os_helpers
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers as es_helpers
+
+from opensearchpy import helpers as os_helpers
+from opensearchpy import OpenSearch
 
 
 def generate_os_host_list(hosts):
