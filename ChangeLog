@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* Removed set-url, added baseurl
 * Added URL Option and fixed pep8
 * lxml added
 * smaller changes

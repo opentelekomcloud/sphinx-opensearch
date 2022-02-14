@@ -88,7 +88,6 @@ def get_parser():
     parser.add_argument(
         '--doc-url',
         metavar='<doc_url>',
-        default='',
         help='Doc-URL for the search results.'
     )
 
@@ -125,10 +124,15 @@ def delete_index(client, index):
         sys.exit('Exception raised while index deletion:\n' + str(e))
 
 
-def generate_path(args):
-    path = args.path
+def add_end_slash(path):
     if path[-1] != '/':
         path = path + '/'
+    return path
+
+
+def remove_start_slash(path):
+    if path[0] == '/':
+        path = path[1:]
     return path
 
 
@@ -200,18 +204,38 @@ def main():
 
     if args.delete_index:
         delete_index(client=client, index=args.index)
-    path = generate_path(args)
+    path = add_end_slash(args.path)
     file_structure = get_file_structure(path)
-    response = create_index_data(
-        client=client,
-        path=path,
-        file_structure=file_structure,
-        index=args.index,
-        post_count=args.post_count,
-        variant=args.variant,
-        base_url=args.base_url,
-        doc_url=args.doc_url
-    )
+
+    base_url = add_end_slash(args.base_url)
+
+    if args.doc_url:
+        doc_url = add_end_slash(args.doc_url)
+        doc_url = remove_start_slash(doc_url)
+
+        response = create_index_data(
+            client=client,
+            path=path,
+            file_structure=file_structure,
+            index=args.index,
+            post_count=args.post_count,
+            variant=args.variant,
+            base_url=base_url,
+            doc_url=doc_url
+        )
+
+    else:
+        response = create_index_data(
+            client=client,
+            path=path,
+            file_structure=file_structure,
+            index=args.index,
+            post_count=args.post_count,
+            variant=args.variant,
+            base_url=base_url,
+            doc_url=''
+        )
+
     print(str(response['uploaded_files']) + ' new files successfully imported'
           ' to index ' + args.index)
 
