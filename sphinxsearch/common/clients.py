@@ -11,10 +11,11 @@
 # under the License.
 import sys
 
-from opensearchpy import OpenSearch
-from opensearchpy import helpers as os_helpers
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers as es_helpers
+
+from opensearchpy import helpers as os_helpers
+from opensearchpy import OpenSearch
 
 
 def generate_os_host_list(hosts):
@@ -62,6 +63,30 @@ def create_index(client, json_list, index, variant):
                 client,
                 json_list,
                 index=index
+            )
+    except Exception as e:
+        sys.exit("\nERROR:\n" + str(e))
+    return response
+
+
+def set_url(client, url, doc_id, index, variant):
+    try:
+        if variant == 'opensearch':
+            response = client.index(
+                index=index,
+                body={
+                    'url': url
+                },
+                id=doc_id,
+                refresh=True
+            )
+        if variant == 'elasticsearch':
+            response = client.index(
+                index=index,
+                id=doc_id,
+                document={
+                    'url': url
+                }
             )
     except Exception as e:
         sys.exit("\nERROR:\n" + str(e))
