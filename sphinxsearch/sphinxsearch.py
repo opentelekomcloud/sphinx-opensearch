@@ -24,10 +24,25 @@ def get_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
+        '--base-url',
+        metavar='<base_url>',
+        required=True,
+        help='Base-URL used to define a given URL where the documentation '
+             'files are listed, e.g. http://test.com/'
+    )
+    parser.add_argument(
         '--delete-index',
         action='store_true',
         help='Option deletes old index with the same name and creates new '
              'one.'
+    )
+    parser.add_argument(
+        '--doc-url',
+        metavar='<doc_url>',
+        help='Optional URL part to substitute different documentation '
+             'names under a given base-url, e.g. api-ref/service-A/ . '
+             'The combination of mandatory base-URL and optional '
+             'doc-URL results in the final URL.'
     )
     parser.add_argument(
         '--hosts',
@@ -42,14 +57,14 @@ def get_parser():
         '--index',
         metavar='<index>',
         default='test-index',
-        help="Search index for OpenSearch or ElasticSearch.\n"
+        help="OpenSearch / ElasticSearch index name.\n"
              'Default: test-index'
     )
     parser.add_argument(
         '--path',
         metavar='<path>',
         default=".",
-        help="Path to json output folder of Sphinx.\n"
+        help="Path to json output folder of Sphinx json-build process.\n"
              'Default: .'
     )
     parser.add_argument(
@@ -78,17 +93,6 @@ def get_parser():
         help=('Search backend variant.\n'
               'default: opensearch\n'
               'choices: elasticsearch, opensearch')
-    )
-    parser.add_argument(
-        '--base-url',
-        metavar='<base_url>',
-        required=True,
-        help='Base-URL for the search results.'
-    )
-    parser.add_argument(
-        '--doc-url',
-        metavar='<doc_url>',
-        help='Doc-URL for the search results.'
     )
 
     args = parser.parse_args()
