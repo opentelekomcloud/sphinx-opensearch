@@ -1,23 +1,23 @@
-# Python-Sphinxsearch
+# Sphinx-Opensearch
 
-The project python-sphinxsearch is used to index Sphinx-based documentations into Opensearch or Elasticsearch environments.
+The project sphinx-opensearch is used to index Sphinx-based documentations into Opensearch or Elasticsearch environments.
 The current application is in alpha state and will be maintained continuosly until a first productive version will be released.
 
 ## Installation
 
-The following instructions describe several ways to install python-sphinxsearch.
+The following instructions describe several ways to install sphinx-opensearch.
 
 ### Installation via PyPi repository
 
 ```
-pip install python-sphinxsearch
+pip install sphinx-opensearch
 ```
 
 ### Installation from Sources
 
 ```
-git clone git@github.com:opentelekomcloud/python-sphinxsearch.git
-cd ./python-sphinxsearch
+git clone git@github.com:opentelekomcloud/sphinx-opensearch.git
+cd ./sphinx-opensearch
 python setup.py install
 ```
 
@@ -40,7 +40,7 @@ The listed parameters are used to configure the indexing behavior of python-spin
 
 ## Example
 
-The following example shows the usage of python-sphinxsearch. 
+The following example shows the usage of sphinx-opensearch. 
 
 ---
 **NOTE**
