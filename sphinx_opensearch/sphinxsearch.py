@@ -15,8 +15,8 @@ import os
 import sys
 
 from bs4 import BeautifulSoup
-from sphinxsearch.common.clients import create_index
-from sphinxsearch.common.clients import Searchclient
+from sphinx_opensearch.common.clients import create_index
+from sphinx_opensearch.common.clients import Searchclient
 
 
 def get_parser():
