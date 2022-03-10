@@ -25,7 +25,7 @@ def generate_os_host_list(hosts):
         if len(raw_host) != 2:
             raise Exception('--hosts parameter does not match the following '
                             'format: hostname:port')
-        json_host = {'host': raw_host[0], 'port': raw_host[1]}
+        json_host = {'host': raw_host[0], 'port': int(raw_host[1])}
         host_list.append(json_host)
     return host_list
 
