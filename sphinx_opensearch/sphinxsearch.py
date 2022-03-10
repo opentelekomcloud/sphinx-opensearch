@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+import logging
 
 from bs4 import BeautifulSoup
 from sphinx_opensearch.common.clients import create_index
@@ -29,6 +30,11 @@ def get_parser():
         required=True,
         help='Base-URL used to define a given URL where the documentation '
              'files are listed, e.g. http://test.com/'
+    )
+    parser.add_argument(
+        '--debug',
+        action='store_true',
+        help='Option enables Debug output.'
     )
     parser.add_argument(
         '--delete-index',
@@ -197,6 +203,9 @@ def create_index_data(client, path, file_structure,
 def main():
     args = get_parser()
     user = get_user(args)
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
 
     client = Searchclient(
         variant=args.variant,
