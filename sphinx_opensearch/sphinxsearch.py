@@ -32,6 +32,12 @@ def get_parser():
              'files are listed, e.g. http://test.com/'
     )
     parser.add_argument(
+        '--category',
+        metavar='<category>',
+        help='Category of the imported documents. For example "umn". ',
+        default=''
+    )
+    parser.add_argument(
         '--debug',
         action='store_true',
         help='Option enables Debug output.'
@@ -159,7 +165,7 @@ def get_file_structure(path):
 
 def create_index_data(client, path, file_structure,
                       index, post_count, variant, base_url,
-                      doc_url):
+                      doc_url, category):
     json_list = []
     responses = []
     file_structure_length = len(file_structure)
@@ -172,6 +178,7 @@ def create_index_data(client, path, file_structure,
             data = json.load(file)
             data['base_url'] = base_url
             data['doc_url'] = doc_url
+            data['category'] = category
             data["body"] = BeautifulSoup(data["body"], "lxml").text
             file.close()
         except Exception as e:
@@ -234,7 +241,8 @@ def main():
             post_count=args.post_count,
             variant=args.variant,
             base_url=base_url,
-            doc_url=doc_url
+            doc_url=doc_url,
+            category=args.category
         )
 
     else:
@@ -246,7 +254,8 @@ def main():
             post_count=args.post_count,
             variant=args.variant,
             base_url=base_url,
-            doc_url=''
+            doc_url='',
+            category=args.category
         )
 
     print(str(response['uploaded_files']) + ' new files successfully imported'
