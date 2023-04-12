@@ -191,7 +191,7 @@ def create_index_data(base_url, category, client, doc_url, doc_type,
             data['category'] = category
             data['doc_url'] = doc_url
             data['doc_type'] = doc_type
-            data['servie_type'] = service_type
+            data['service_type'] = service_type
             file.close()
         except Exception as e:
             sys.exit("\nERROR:\n" + str(e))
@@ -243,6 +243,7 @@ def main():
 
     doc_url = ''
     doc_type = ''
+    service_type = ''
     if args.doc_url:
         doc_url = add_end_slash(args.doc_url)
         doc_url = remove_start_slash(doc_url)
@@ -254,10 +255,16 @@ def main():
             except:
                 doc_type = ''
 
+        if not args.service_type:
+            try:
+                service_type_list = doc_url.split("/")
+                service_type = doc_type_list[0]
+            except:
+                service_type = ''
+
     if args.doc_type:
         doc_type = args.doc_type
 
-    service_type = ''
     if args.service_type:
         service_type = args.service_type
 
