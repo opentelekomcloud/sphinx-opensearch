@@ -49,6 +49,11 @@ def get_parser():
              'one.'
     )
     parser.add_argument(
+        '--doc-type',
+        metavar='<doc_type>',
+        help='Document type of the imported documents e.g. umn, api-ref... '
+    )
+    parser.add_argument(
         '--doc-url',
         metavar='<doc_url>',
         help='Optional URL part to substitute different documentation '
@@ -96,6 +101,11 @@ def get_parser():
         '--password',
         metavar='<password>',
         help='Password for the connection.'
+    )
+    parser.add_argument(
+        '--service-type',
+        metavar='<service_type>',
+        help='Service type of corresponding service.'
     )
     parser.add_argument(
         '--variant',
@@ -163,9 +173,9 @@ def get_file_structure(path):
     return file_structure
 
 
-def create_index_data(client, path, file_structure,
-                      index, post_count, variant, base_url,
-                      doc_url, category):
+def create_index_data(base_url, category, client, doc_url, doc_type,
+                      file_structure, index, path, post_count, service_type,
+                      variant):
     json_list = []
     responses = []
     file_structure_length = len(file_structure)
@@ -177,9 +187,11 @@ def create_index_data(client, path, file_structure,
             file = open(file_path,)
             data = json.load(file)
             data['base_url'] = base_url
-            data['doc_url'] = doc_url
-            data['category'] = category
             data["body"] = BeautifulSoup(data["body"], "lxml").text
+            data['category'] = category
+            data['doc_url'] = doc_url
+            data['doc_type'] = doc_type
+            data['servie_type'] = service_type
             file.close()
         except Exception as e:
             sys.exit("\nERROR:\n" + str(e))
@@ -229,37 +241,36 @@ def main():
 
     base_url = add_end_slash(args.base_url)
 
+    doc_url = ''
     if args.doc_url:
         doc_url = add_end_slash(args.doc_url)
         doc_url = remove_start_slash(doc_url)
 
-        response = create_index_data(
-            client=client,
-            path=path,
-            file_structure=file_structure,
-            index=args.index,
-            post_count=args.post_count,
-            variant=args.variant,
-            base_url=base_url,
-            doc_url=doc_url,
-            category=args.category
-        )
+    doc_type = ''
+    if args.doc_type:
+        doc_type = args.doc_type
 
-    else:
-        response = create_index_data(
-            client=client,
-            path=path,
-            file_structure=file_structure,
-            index=args.index,
-            post_count=args.post_count,
-            variant=args.variant,
-            base_url=base_url,
-            doc_url='',
-            category=args.category
-        )
+    service_type = ''
+    if args.service_type:
+        service_type = args.service_type
 
-    print(str(response['uploaded_files']) + ' new files successfully imported'
-          ' to index ' + args.index)
+    response = create_index_data(
+        base_url=base_url,
+        category=args.category,
+        client=client,
+        doc_type=doc_type,
+        doc_url=doc_url,
+        file_structure=file_structure,
+        index=args.index,
+        path=path,
+        post_count=args.post_count,
+        service_type=service_type,
+        variant=args.variant
+    )
+
+    logging.info(str(response['uploaded_files'])
+                 + ' new files successfully imported to index '
+                 + args.index)
 
 
 if __name__ == "__main__":
