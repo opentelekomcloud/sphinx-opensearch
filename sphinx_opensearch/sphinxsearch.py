@@ -242,11 +242,18 @@ def main():
     base_url = add_end_slash(args.base_url)
 
     doc_url = ''
+    doc_type = ''
     if args.doc_url:
         doc_url = add_end_slash(args.doc_url)
         doc_url = remove_start_slash(doc_url)
 
-    doc_type = ''
+        if not args.doc_type:
+            try:
+                doc_type_list = doc_url.split("/")
+                doc_type = doc_type_list[1]
+            except:
+                doc_type = ''
+
     if args.doc_type:
         doc_type = args.doc_type
 
